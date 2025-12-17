@@ -1,0 +1,41 @@
+{
+  "name": "agentia",
+  "version": "1.0.0",
+  "description": "AI Agent Playground",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "playground"
+  ],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.24.0",
+  "devDependencies": {
+    "@types/node": "^25.0.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@ai-sdk/deepseek": "^1.0.32",
+    "@ai-sdk/google": "^2.0.46",
+    "@ai-sdk/openai": "^2.0.86",
+    "@ai-sdk/xai": "^2.0.40",
+    "@langchain/anthropic": "^1.3.0",
+    "@langchain/community": "^1.1.0",
+    "@langchain/core": "^1.1.5",
+    "@langchain/google-genai": "^2.1.0",
+    "@langchain/openai": "^1.2.0",
+    "@openrouter/ai-sdk-provider": "^1.5.3",
+    "ai": "^5.0.113",
+    "langchain": "^1.2.0",
+    "zod": "^4.1.13"
+  }
+}
