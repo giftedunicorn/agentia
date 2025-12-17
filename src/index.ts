@@ -45,6 +45,12 @@ const examples = [
     description: "Todos management with working memory",
     file: "examples/05-with-todos-management.ts",
   },
+  {
+    id: "6",
+    name: "Comparison with and without context",
+    description: "Comparison with and without context",
+    file: "examples/comparison-with-without-context.ts",
+  },
 ];
 
 function printHelp() {
