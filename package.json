@@ -35,6 +35,7 @@
     "@langchain/openai": "^1.2.0",
     "@openrouter/ai-sdk-provider": "^1.5.3",
     "ai": "^5.0.113",
+    "deepagents": "^1.3.1",
     "dotenv": "^17.2.3",
     "langchain": "^1.2.0",
     "zod": "^4.1.13"
