@@ -8,6 +8,10 @@
  *   npx tsx playground/index.ts all  # Run all examples
  */
 
+// Load environment variables from .env file
+import { config } from "dotenv";
+config();
+
 import { execSync } from "child_process";
 
 const examples = [

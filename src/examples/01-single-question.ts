@@ -6,6 +6,10 @@
  * Scenario: User asks about competitors for their AI code assistant idea
  */
 
+// Load environment variables
+import { config } from "dotenv";
+config();
+
 import { HumanMessage } from "@langchain/core/messages";
 import { createStartupAdvisor } from "../core/startup-advisor";
 import { allTools } from "../tools";
