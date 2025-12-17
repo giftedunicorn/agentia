@@ -1,21 +1,23 @@
 /**
  * Deep Agent for Startup Advisor
  *
- * 使用 deepagents 创建一个具有以下能力的 Agent：
+ * Uses our custom deepagents implementation with bug fixes:
  * - Planning (write_todos 工具)
  * - SubAgents (task 工具)
  * - File system (长期记忆)
  * - 业务工具 (competitor, market, customer)
  * - SubAgent: vc-report (综合评估专家)
+ *
+ * Our implementation fixes the "files channel already exists" bug
+ * by removing createFilesystemMiddleware from subagent's defaultMiddleware.
  */
 
-import { createDeepAgent, type SubAgent } from "deepagents";
+import { createDeepAgent, type SubAgent } from "../deepagents";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import {
   competitorTool,
   marketTool,
   customerTool,
-  // vcReportTool,
 } from "../tools";
 
 /**
@@ -108,16 +110,20 @@ Your reports should give investors confidence in their decision-making.`,
 
 /**
  * 创建 Startup Advisor Deep Agent
+ *
+ * Uses our custom deepagents implementation with the "files channel" bug fixed.
+ * Our implementation removes createFilesystemMiddleware from subagent's defaultMiddleware,
+ * allowing subagents to inherit the files state from the main agent.
  */
 export function createStartupAdvisorDeepAgent() {
   // 使用 Gemini 模型
   const model = new ChatGoogleGenerativeAI({
-    model: "gemini-3-pro-preview",
+    model: "gemini-2.0-flash-exp",
     temperature: 0.7,
     apiKey: process.env.GEMINI_API_KEY,
   });
 
-  // 创建 Deep Agent
+  // 创建 Deep Agent with our fixed implementation
   const agent = createDeepAgent({
     model,
     systemPrompt: MAIN_SYSTEM_PROMPT,

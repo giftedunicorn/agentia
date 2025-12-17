@@ -334,6 +334,121 @@ console.log(`当前: ${current?.activeForm}`);
 
 技术文档：[docs/Claude_Code_三大技术突破详解.md](docs/Claude_Code_三大技术突破详解.md)
 
+---
+
+## 🚀 DeepAgents - Agent 的进阶架构
+
+DeepAgents 是受 Claude Code 启发的 Agent 架构，提供两个核心能力：
+
+### 1. 📋 Planning (计划) - `write_todos` 工具
+
+Agent 自动将复杂任务分解为步骤并追踪进度：
+
+```typescript
+// User: "Build a feature with tests"
+// Agent 自动创建计划:
+write_todos({
+  todos: [
+    { content: "Design API", status: "in_progress" },
+    { content: "Implement", status: "pending" },
+    { content: "Write tests", status: "pending" }
+  ]
+})
+```
+
+**何时使用**: 复杂多步骤任务 (3+ steps)
+
+### 2. 🤖 Subagent Spawning (子代理) - `task` 工具
+
+Agent 可以生成专门的子代理处理特定任务（上下文隔离）：
+
+```typescript
+// Main agent spawns specialist
+task({
+  subagent_type: "vc-report",
+  description: "Generate comprehensive VC evaluation..."
+})
+
+// Subagent works in isolation with clean context
+// Returns result to main agent
+```
+
+**何时使用**: 需要深度分析、上下文隔离、并行执行
+
+### DeepAgents 架构图
+
+```
+Main Agent (父代理)
+├─ 能力: Planning (write_todos)
+├─ 上下文: 完整对话历史
+├─ 工具: 基础工具 + task 工具
+│
+└─ 生成 Subagent (子代理) ─────┐
+                              │
+   Subagent (隔离的子代理)    │
+   ├─ 上下文: 仅任务描述      │
+   ├─ 工具: 专门工具          │
+   └─ 返回: 分析结果 ─────────┘
+```
+
+### 快速开始
+
+```bash
+# 教育演示 - 理解 DeepAgents 工作原理
+pnpm run dev 11
+
+# 简单 Agent (仅 Planning)
+pnpm run dev 7
+
+# 完整 DeepAgent (Planning + Subagents)
+# 注意: 由于 deepagents 1.3.1 的 bug，目前暂时不可用
+pnpm run dev 8
+```
+
+### 学习资源
+
+- **快速参考**: [docs/DEEPAGENTS_QUICK_REFERENCE.md](docs/DEEPAGENTS_QUICK_REFERENCE.md)
+- **完整指南**: [docs/HOW_DEEPAGENTS_WORK.md](docs/HOW_DEEPAGENTS_WORK.md)
+- **Bug 分析**: [docs/DEEPAGENTS_BUG_ANALYSIS.md](docs/DEEPAGENTS_BUG_ANALYSIS.md)
+- **交互演示**: `pnpm run dev 11`
+
+### 代码示例
+
+```typescript
+import { createDeepAgent } from "deepagents";
+
+const agent = createDeepAgent({
+  model,
+  systemPrompt: "You are a helpful assistant...",
+  tools: [tool1, tool2],
+  subagents: [{
+    name: "specialist",
+    description: "Expert in specific domain",
+    systemPrompt: "You are an expert...",
+    tools: [specializedTool]
+  }]
+});
+
+// Agent 自动使用 planning + subagents
+const result = await agent.invoke({
+  messages: [new HumanMessage("Complex task...")]
+});
+
+// 查看计划
+console.log(result.todos);
+```
+
+### 关键概念
+
+| 概念 | 工具/状态 | 用途 |
+|-----|---------|------|
+| **Planning** | `write_todos` | 分解任务、追踪进度 |
+| **Subagents** | `task` | 上下文隔离、专门分析 |
+| **并行执行** | 多个 `task` 调用 | 提高效率 |
+| **专业化** | 自定义 subagent | 领域专家 |
+
+---
+
 ## 核心代码示例
 
 ### 创建 Agent

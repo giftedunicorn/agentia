@@ -1,0 +1,140 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+deleted file mode 100644
+index dad2098db31b7bda4c57aa7d715eb4dc0e930a84..0000000000000000000000000000000000000000
+diff --git a/dist/graph/zod/meta.cjs b/dist/graph/zod/meta.cjs
+index 266791363f1e357d04eb1769a9cff588ad996ad4..24b65192a4fe2b514316ee7ab0e7c8ed249aa54b 100644
+--- a/dist/graph/zod/meta.cjs
++++ b/dist/graph/zod/meta.cjs
+@@ -21,6 +21,14 @@ var SchemaMetaRegistry = class {
+ 	*/
+ 	_extensionCache = /* @__PURE__ */ new Map();
+ 	/**
++	* Cache for channel instances per field schema.
++	* This ensures the same field schema always returns the same channel instance,
++	* preventing "Channel already exists with a different type" errors when
++	* the same schema field is used across multiple object schemas.
++	* @internal
++	*/
++	_channelCache = /* @__PURE__ */ new WeakMap();
++	/**
+ 	* Retrieves the metadata associated with a given schema.
+ 	* @template TValue The value type of the schema.
+ 	* @template TUpdate The update type of the schema (defaults to TValue).
+@@ -64,6 +72,11 @@ var SchemaMetaRegistry = class {
+ 	*
+ 	* This is used to create the `channels` object that's passed to the `Graph` constructor.
+ 	*
++	* Channel instances are cached per field schema to ensure that the same schema field
++	* always returns the same channel instance. This prevents "Channel already exists with
++	* a different type" errors when multiple StateGraphs use schemas that share the same
++	* field definitions (e.g., when main agent and subagents both use filesystem middleware).
++	*
+ 	* @template T The shape of the schema.
+ 	* @param schema The schema to extract channels from.
+ 	* @returns A mapping from property names to channel instances.
+@@ -72,9 +85,19 @@ var SchemaMetaRegistry = class {
+ 		const channels = {};
+ 		const shape = (0, __langchain_core_utils_types.getInteropZodObjectShape)(schema);
+ 		for (const [key, channelSchema] of Object.entries(shape)) {
++			// Check if we already have a cached channel for this field schema
++			const cachedChannel = this._channelCache.get(channelSchema);
++			if (cachedChannel) {
++				channels[key] = cachedChannel;
++				continue;
++			}
++			// Create a new channel and cache it
+ 			const meta = this.get(channelSchema);
+-			if (meta?.reducer) channels[key] = new require_binop.BinaryOperatorAggregate(meta.reducer.fn, meta.default);
+-			else channels[key] = new require_last_value.LastValue();
++			let channel;
++			if (meta?.reducer) channel = new require_binop.BinaryOperatorAggregate(meta.reducer.fn, meta.default);
++			else channel = new require_last_value.LastValue();
++			this._channelCache.set(channelSchema, channel);
++			channels[key] = channel;
+ 		}
+ 		return channels;
+ 	}
+diff --git a/dist/graph/zod/meta.d.ts b/dist/graph/zod/meta.d.ts
+index 2104bfed321450ec40dc4122f34e8ed4828f57cf..fda8a454cd1d880456d35eddcf422a13e4ddd9e4 100644
+--- a/dist/graph/zod/meta.d.ts
++++ b/dist/graph/zod/meta.d.ts
+@@ -38,6 +38,14 @@ declare class SchemaMetaRegistry {
+    * @internal
+    */
+   _extensionCache: Map<string, WeakMap<InteropZodType, InteropZodType>>;
++  /**
++   * Cache for channel instances per field schema.
++   * This ensures the same field schema always returns the same channel instance,
++   * preventing "Channel already exists with a different type" errors when
++   * the same schema field is used across multiple object schemas.
++   * @internal
++   */
++  _channelCache: WeakMap<InteropZodType, BaseChannel>;
+   /**
+    * Retrieves the metadata associated with a given schema.
+    * @template TValue The value type of the schema.
+@@ -72,6 +80,11 @@ declare class SchemaMetaRegistry {
+    *
+    * This is used to create the `channels` object that's passed to the `Graph` constructor.
+    *
++   * Channel instances are cached per field schema to ensure that the same schema field
++   * always returns the same channel instance. This prevents "Channel already exists with
++   * a different type" errors when multiple StateGraphs use schemas that share the same
++   * field definitions (e.g., when main agent and subagents both use filesystem middleware).
++   *
+    * @template T The shape of the schema.
+    * @param schema The schema to extract channels from.
+    * @returns A mapping from property names to channel instances.
+diff --git a/dist/graph/zod/meta.js b/dist/graph/zod/meta.js
+index 4b15ddcc5862ccaec34ab4a04f0c8c17988bc594..29452e0ad68a0c2583e762933537494b0a33a7b9 100644
+--- a/dist/graph/zod/meta.js
++++ b/dist/graph/zod/meta.js
+@@ -20,6 +20,14 @@ var SchemaMetaRegistry = class {
+ 	*/
+ 	_extensionCache = /* @__PURE__ */ new Map();
+ 	/**
++	* Cache for channel instances per field schema.
++	* This ensures the same field schema always returns the same channel instance,
++	* preventing "Channel already exists with a different type" errors when
++	* the same schema field is used across multiple object schemas.
++	* @internal
++	*/
++	_channelCache = /* @__PURE__ */ new WeakMap();
++	/**
+ 	* Retrieves the metadata associated with a given schema.
+ 	* @template TValue The value type of the schema.
+ 	* @template TUpdate The update type of the schema (defaults to TValue).
+@@ -63,6 +71,11 @@ var SchemaMetaRegistry = class {
+ 	*
+ 	* This is used to create the `channels` object that's passed to the `Graph` constructor.
+ 	*
++	* Channel instances are cached per field schema to ensure that the same schema field
++	* always returns the same channel instance. This prevents "Channel already exists with
++	* a different type" errors when multiple StateGraphs use schemas that share the same
++	* field definitions (e.g., when main agent and subagents both use filesystem middleware).
++	*
+ 	* @template T The shape of the schema.
+ 	* @param schema The schema to extract channels from.
+ 	* @returns A mapping from property names to channel instances.
+@@ -71,9 +84,19 @@ var SchemaMetaRegistry = class {
+ 		const channels = {};
+ 		const shape = getInteropZodObjectShape(schema);
+ 		for (const [key, channelSchema] of Object.entries(shape)) {
++			// Check if we already have a cached channel for this field schema
++			const cachedChannel = this._channelCache.get(channelSchema);
++			if (cachedChannel) {
++				channels[key] = cachedChannel;
++				continue;
++			}
++			// Create a new channel and cache it
+ 			const meta = this.get(channelSchema);
+-			if (meta?.reducer) channels[key] = new BinaryOperatorAggregate(meta.reducer.fn, meta.default);
+-			else channels[key] = new LastValue();
++			let channel;
++			if (meta?.reducer) channel = new BinaryOperatorAggregate(meta.reducer.fn, meta.default);
++			else channel = new LastValue();
++			this._channelCache.set(channelSchema, channel);
++			channels[key] = channel;
+ 		}
+ 		return channels;
+ 	}

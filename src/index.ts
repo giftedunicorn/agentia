@@ -59,8 +59,8 @@ const examples = [
   },
   {
     id: "8",
-    name: "Deep Agent (Full) ⚠️ BROKEN",
-    description: "DeepAgents - Has unfixable bug, use Example 10 instead",
+    name: "Deep Agent (Full) ✅ FIXED",
+    description: "DeepAgents with subagents (bug fixed in our custom implementation)",
     file: "examples/08-deep-agent.ts",
   },
   {
@@ -68,6 +68,12 @@ const examples = [
     name: "Deep Agent (Manual)",
     description: "Manual deep agent assembly with middleware",
     file: "examples/09-manual-deep-agent.ts",
+  },
+  {
+    id: "11",
+    name: "DeepAgents Explained 📚",
+    description: "Educational demo: How planning & subagents work",
+    file: "examples/11-deepagents-explained.ts",
   },
 ];
 

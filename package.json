@@ -19,6 +19,11 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.24.0",
+  "pnpm": {
+    "patchedDependencies": {
+      "@langchain/langgraph@1.0.2": "patches/@langchain__langgraph@1.0.2.patch"
+    }
+  },
   "devDependencies": {
     "@types/node": "^25.0.2",
     "tsx": "^4.21.0",
@@ -33,13 +38,17 @@
     "@langchain/community": "^1.1.0",
     "@langchain/core": "^1.1.5",
     "@langchain/google-genai": "^2.1.0",
+    "@langchain/langgraph": "1.0.2",
+    "@langchain/langgraph-checkpoint": "^1.0.0",
     "@langchain/openai": "^1.2.0",
     "@langchain/tavily": "^1.1.0",
     "@openrouter/ai-sdk-provider": "^1.5.3",
     "ai": "^5.0.113",
     "deepagents": "^1.3.1",
     "dotenv": "^17.2.3",
+    "fast-glob": "^3.3.3",
     "langchain": "^1.2.0",
+    "micromatch": "^4.0.8",
     "zod": "^4.1.13"
   }
 }

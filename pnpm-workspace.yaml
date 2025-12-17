@@ -1,0 +1,2 @@
+patchedDependencies:
+  '@langchain/langgraph@1.0.2': patches/@langchain__langgraph@1.0.2.patch

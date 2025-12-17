@@ -1,30 +1,36 @@
 /**
- * Example 7: Deep Agent with Planning, SubAgents, and Memory
+ * Example 8: Deep Agent with Planning, SubAgents, and Memory
  *
- * Demonstrates: Using deepagents for complex, multi-step conversations
+ * Demonstrates: Using our fixed deepagents implementation for complex conversations
  *
  * Key features:
- * - Automatic task planning (write_todos tool)
- * - SubAgent spawning for specialized analysis
- * - File system for long-term memory
- * - Claude Code-inspired architecture
+ * - ✅ Automatic task planning (write_todos tool)
+ * - ✅ SubAgent spawning for specialized analysis
+ * - ✅ File system for long-term memory
+ * - ✅ Claude Code-inspired architecture
+ * - ✅ Bug fixed: No more "files channel already exists" error!
+ *
+ * Our custom implementation removes createFilesystemMiddleware from
+ * subagent's defaultMiddleware to fix the state channel conflict.
  */
 
 // Load environment variables
 import { config } from "dotenv";
 config();
 
+import { HumanMessage } from "@langchain/core/messages";
 import { createStartupAdvisorDeepAgent } from "../agents/deep-agent";
 
 async function main() {
   console.log("\n" + "=".repeat(60));
-  console.log("🧠 EXAMPLE 7: Deep Agent - Complete Conversation");
+  console.log("🧠 EXAMPLE 8: Deep Agent - Complete Conversation");
   console.log("=".repeat(60));
   console.log("\nThis example demonstrates Deep Agent capabilities:\n");
   console.log("✓ Automatic task planning with write_todos");
   console.log("✓ SubAgent spawning for specialized work");
   console.log("✓ File system for memory and context");
   console.log("✓ Claude Code-inspired architecture");
+  console.log("✓ Bug fixed: Files channel conflict resolved!");
   console.log("\n" + "=".repeat(60) + "\n");
 
   // 创建 Deep Agent
@@ -43,7 +49,7 @@ async function main() {
     try {
       // Invoke the agent
       const result = await agent.invoke({
-        messages: [{ role: "user", content: userMessage }],
+        messages: [new HumanMessage(userMessage)],
       });
 
       // Extract the final message
@@ -55,6 +61,7 @@ async function main() {
       return result;
     } catch (error: any) {
       console.error(`❌ Error: ${error.message}\n`);
+      console.error(error.stack);
       throw error;
     }
   }
