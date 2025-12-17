@@ -38,7 +38,8 @@ playground/
 │   ├── competitor.tool.ts            # 竞对分析（Mock 数据）
 │   ├── market.tool.ts                # 市场规模（Mock 数据）
 │   ├── customer.tool.ts              # 客户分析（Mock 数据）
-│   └── vc-report.tool.ts             # VC 评估报告（整合其他工具）
+│   ├── vc-report.tool.ts             # VC 评估报告（整合其他工具）
+│   └── todo.tool.ts                  # 📝 Todos 管理工具（YJ1 排序算法）
 │
 ├── context/                           # 🧠 上下文管理（核心！）
 │   ├── types.ts                      # 上下文类型定义
@@ -47,13 +48,15 @@ playground/
 │   └── context-aware-agent.ts        # 带完整上下文管理的 Agent
 │
 ├── docs/                              # 文档
-│   └── CONTEXT_MANAGEMENT.md         # 上下文管理详解
+│   ├── CONTEXT_MANAGEMENT.md         # 上下文管理详解
+│   └── Claude_Code_三大技术突破详解.md # Claude Code 技术分析
 │
 └── examples/                          # 渐进式示例
     ├── 01-single-question.ts         # Level 1: 单个问题 → 单个工具
     ├── 02-multi-turn-chat.ts         # Level 2: 多轮对话 + 自动选择工具
     ├── 03-full-conversation.ts       # Level 3: 完整对话流程 + VC 报告
     ├── 04-with-context-management.ts # Level 4: 完整上下文管理 ⭐
+    ├── 05-with-todos-management.ts   # Level 5: Todos 管理系统 📝
     └── comparison-with-without-context.ts # 对比：有无上下文管理
 ```
 
@@ -105,13 +108,24 @@ npx tsx playground/examples/03-full-conversation.ts
 
 #### ⭐ Level 4: 完整上下文管理（推荐）
 ```bash
-npx tsx playground/examples/04-with-context-management.ts
+pnpm dev:context
 ```
 **场景**：展示完整上下文管理的威力
 - ✅ 自动提取创业想法信息
 - ✅ 缓存工具结果（避免重复调用）
 - ✅ 智能意图检测
 - ✅ 上下文感知的回答
+
+#### 📝 Level 5: Todos 管理系统
+```bash
+pnpm dev:todos
+```
+**场景**：展示 Claude Code 启发的任务追踪系统
+- ✅ YJ1 智能排序算法（status → priority → time）
+- ✅ 实时进度跟踪
+- ✅ 优先级管理（high/medium/low）
+- ✅ System Prompt 集成
+- ✅ 自动任务生命周期管理
 
 #### 对比示例
 ```bash
@@ -203,6 +217,122 @@ agent.printMemorySummary();
 - 输入：`ideaDescription` (string)
 - 输出：7 维度评分、SWOT 分析、投资建议
 - **特点**：内部会自动调用其他 3 个工具
+
+### 5. manage_todos 📝
+管理任务列表，追踪多步骤任务的进度
+- 输入：`todos` (Todo[])
+- 输出：排序后的任务列表、进度统计、当前任务
+- **特点**：
+  - YJ1 智能排序算法（三层优先级）
+  - 实时进度跟踪（百分比、完成数）
+  - 优先级支持（high/medium/low）
+  - 自动任务生命周期管理
+  - 集成到 System Prompt
+
+## 📝 Todos 管理系统 - Agent 的任务追踪能力
+
+受 Claude Code 启发的任务管理系统，让 Agent 能够追踪复杂的多步骤任务。
+
+### 为什么需要 Todos 管理？
+
+当用户提出复杂请求时（如"给我做个完整的创业评估"），Agent 需要：
+1. 分解任务为多个步骤
+2. 追踪每个步骤的完成状态
+3. 向用户报告进度
+4. 确保不遗漏任何步骤
+
+### YJ1 排序算法
+
+Todos 使用三层排序确保最重要的任务优先显示：
+
+```
+Layer 1: Status (状态优先级)
+  ⚡ in_progress (0)  ← 正在进行的任务（最高优先级）
+  ⏳ pending (1)      ← 待处理任务
+  ✓ completed (2)     ← 已完成任务（最低优先级）
+
+Layer 2: Priority (重要性优先级)
+  high (0)    ← 紧急/重要
+  medium (1)  ← 正常优先级
+  low (2)     ← 不紧急
+
+Layer 3: Creation Time (创建时间)
+  早 → 晚     ← 先创建的任务优先
+```
+
+### 使用示例
+
+```typescript
+import { ContextAwareAgent } from "./context/context-aware-agent";
+import { allTools } from "./tools";
+
+const agent = new ContextAwareAgent(allTools);
+
+// Agent 会自动创建 todos 来追踪复杂任务
+await agent.chat(
+  "我需要完整的创业评估：竞对分析、市场规模、客户研究、VC报告"
+);
+
+// Agent 自动创建的 todos:
+// 1. ⚡ [HIGH] 分析竞对
+// 2. ⏳ [HIGH] 估算市场规模
+// 3. ⏳ [MEDIUM] 研究目标客户
+// 4. ⏳ [MEDIUM] 生成 VC 报告
+
+// 查看进度
+await agent.chat("我们的进度如何？");
+// Agent: "我们已完成 2/4 任务（50%），当前正在研究目标客户..."
+```
+
+### Todos 在 System Prompt 中的体现
+
+Todos 会自动注入到 System Prompt，让 Agent 始终知道当前任务状态：
+
+```
+--- CONTEXT ---
+TODOS (2/4 completed):
+  1. ✓ 分析竞对 [HIGH]
+  2. ✓ 估算市场规模 [HIGH]
+  3. ⚡ 研究目标客户 [MEDIUM]
+  4. ⏳ 生成 VC 报告 [MEDIUM]
+
+CURRENT TASK: 研究目标客户中
+--- END CONTEXT ---
+```
+
+### 手动管理 Todos
+
+```typescript
+const memory = agent.memory;
+
+// 添加任务
+memory.addTodo("分析竞对", "分析竞对中", "high");
+
+// 批量更新
+memory.updateTodos([
+  { content: "分析竞对", activeForm: "分析竞对中", status: "completed", priority: "high" },
+  { content: "估算市场", activeForm: "估算市场中", status: "in_progress", priority: "medium" },
+]);
+
+// 获取进度
+const progress = memory.getProgress();
+console.log(`完成度: ${progress.percentage}%`);
+
+// 获取当前任务
+const current = memory.getCurrentTodo();
+console.log(`当前: ${current?.activeForm}`);
+```
+
+### 完整示例
+
+运行 `pnpm dev:todos` 查看完整演示，包括：
+- ✅ Agent 自动创建和管理 todos
+- ✅ YJ1 排序算法演示
+- ✅ 进度追踪和报告
+- ✅ 优先级调整
+- ✅ 任务生命周期管理
+
+技术文档：[docs/Claude_Code_三大技术突破详解.md](docs/Claude_Code_三大技术突破详解.md)
 
 ## 核心代码示例
 

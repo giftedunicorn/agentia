@@ -33,6 +33,33 @@ export interface AnalysisCache {
   };
 }
 
+// Todo 任务状态
+export type TodoStatus = "pending" | "in_progress" | "completed";
+
+// Todo 优先级
+export type TodoPriority = "high" | "medium" | "low";
+
+// Todo 项
+export interface Todo {
+  // 任务内容（祈使句形式）
+  content: string;
+
+  // 进行中的描述（现在进行时）
+  activeForm: string;
+
+  // 任务状态
+  status: TodoStatus;
+
+  // 优先级
+  priority?: TodoPriority;
+
+  // 创建时间
+  createdAt?: Date;
+
+  // 完成时间
+  completedAt?: Date;
+}
+
 // 工作记忆（最重要的上下文）
 export interface WorkingMemory {
   // 当前讨论的创业想法
@@ -49,6 +76,9 @@ export interface WorkingMemory {
 
   // 用户的关键关注点
   userConcerns: string[];
+
+  // 📝 任务列表（新增）
+  todos: Todo[];
 }
 
 // 完整的对话上下文

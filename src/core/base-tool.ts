@@ -22,10 +22,13 @@ export interface SimpleTool<TInput, TOutput> {
   schema: z.ZodType<TInput>;
 
   /** Core execution logic */
-  execute: (input: TInput) => Promise<TOutput> | TOutput;
+  execute: (input: TInput, context?: any) => Promise<TOutput> | TOutput;
 
   /** Optional: format the result for LLM */
   formatResult?: (result: TOutput) => string;
+
+  /** Whether this tool needs context (memory, etc.) */
+  needsContext?: boolean;
 }
 
 /**
@@ -34,18 +37,21 @@ export interface SimpleTool<TInput, TOutput> {
 export function createTool<TInput, TOutput>(
   config: SimpleTool<TInput, TOutput>
 ): DynamicStructuredTool<z.ZodType<TInput>> {
-  const { name, description, schema, execute, formatResult } = config;
+  const { name, description, schema, execute, formatResult, needsContext } = config;
 
   return tool(
-    async (input: TInput) => {
+    async (input: TInput, toolConfig?: { context?: any }) => {
       const startTime = Date.now();
 
       try {
         console.log(`\n🔧 [${name}] INVOKED`);
         console.log(`   Input:`, JSON.stringify(input, null, 2));
 
-        // Execute the tool
-        const result = await execute(input);
+        // Execute the tool (with context if needed)
+        const context = toolConfig?.context;
+        const result = needsContext
+          ? await execute(input, context)
+          : await execute(input);
 
         const duration = Date.now() - startTime;
         console.log(`✅ [${name}] DONE (${duration}ms)`);
