@@ -11,15 +11,11 @@ import type { Todo } from "../context/types";
 
 // Todo Schema
 const todoSchema = z.object({
-  content: z
-    .string()
-    .describe("任务内容（祈使句形式，如：'分析竞对'）"),
+  content: z.string().describe("任务内容（祈使句形式，如：'分析竞对'）"),
   activeForm: z
     .string()
     .describe("进行中的描述（现在进行时，如：'分析竞对中'）"),
-  status: z
-    .enum(["pending", "in_progress", "completed"])
-    .describe("任务状态"),
+  status: z.enum(["pending", "in_progress", "completed"]).describe("任务状态"),
   priority: z
     .enum(["high", "medium", "low"])
     .optional()
@@ -28,9 +24,7 @@ const todoSchema = z.object({
 
 // Input Schema
 const todoManagementSchema = z.object({
-  todos: z
-    .array(todoSchema)
-    .describe("完整的任务列表（会替换现有列表）"),
+  todos: z.array(todoSchema).describe("完整的任务列表（会替换现有列表）"),
 });
 
 /**
@@ -114,9 +108,7 @@ function formatTodoResult(result: any): string {
           : todo.priority === "low"
           ? " [LOW]"
           : "";
-      lines.push(
-        `  ${index + 1}. ${statusIcon} ${todo.content}${priorityTag}`
-      );
+      lines.push(`  ${index + 1}. ${statusIcon} ${todo.content}${priorityTag}`);
     });
   }
 

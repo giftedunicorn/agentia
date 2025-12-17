@@ -356,9 +356,7 @@ export class MemoryManager {
     // 2. 已完成的分析
     const completed = this.getCompletedAnalyses();
     if (completed.length > 0) {
-      parts.push(
-        `\nCOMPLETED ANALYSES: ${completed.join(", ")}`
-      );
+      parts.push(`\nCOMPLETED ANALYSES: ${completed.join(", ")}`);
     }
 
     // 3. 当前焦点
@@ -386,7 +384,9 @@ export class MemoryManager {
     const todos = this.getTodos();
     if (todos.length > 0) {
       const progress = this.getProgress();
-      parts.push(`\nTODOS (${progress.completed}/${progress.total} completed):`);
+      parts.push(
+        `\nTODOS (${progress.completed}/${progress.total} completed):`
+      );
 
       todos.forEach((todo, index) => {
         const statusIcon =
@@ -396,8 +396,14 @@ export class MemoryManager {
             ? "⚡"
             : "⏳";
         const priorityTag =
-          todo.priority === "high" ? " [HIGH]" : todo.priority === "low" ? " [LOW]" : "";
-        parts.push(`  ${index + 1}. ${statusIcon} ${todo.content}${priorityTag}`);
+          todo.priority === "high"
+            ? " [HIGH]"
+            : todo.priority === "low"
+            ? " [LOW]"
+            : "";
+        parts.push(
+          `  ${index + 1}. ${statusIcon} ${todo.content}${priorityTag}`
+        );
       });
 
       // 显示当前进行中的任务
@@ -446,7 +452,9 @@ Created: ${this.context.createdAt.toISOString()}
 Has Idea: ${this.hasIdea() ? "Yes" : "No"}
 Completed Analyses: ${this.getCompletedAnalyses().join(", ") || "None"}
 Current Focus: ${this.getFocus() || "None"}
-Todos: ${progress.total} total, ${progress.completed} completed (${progress.percentage.toFixed(0)}%)
+Todos: ${progress.total} total, ${
+      progress.completed
+    } completed (${progress.percentage.toFixed(0)}%)
 Current Task: ${currentTodo ? currentTodo.activeForm : "None"}
     `.trim();
   }
