@@ -1,269 +1,278 @@
-# Agentia - AI Agent Playground
+# Startup Advisor Agent Playground
 
-基于 **LangChain** 的现代化 AI Agent 框架，完全遵循官方最佳实践。
+一个简化的 LangChain Agent + Tools 实验场，专注于**对话式创业顾问**场景。
 
-## ✅ 核心特性
+## 场景描述
 
-- **官方 API**: 使用 LangChain 官方推荐的 `createAgent` 和 `tool` API
-- **三层架构**: Agent = 编排，Tool = 业务逻辑，Service = 可复用服务
-- **增强工具**: 支持 Web Search + AI 分析的组合
-- **类型安全**: TypeScript + Zod schema 验证
-- **易于扩展**: 添加 Tool 只需创建一个文件，服务可复用
-- **并行调用**: 自动处理工具的并行和串行调用
-- **多模型支持**: Google Gemini, OpenAI, DeepSeek 等
+用户与 AI 创业顾问对话，Agent 根据用户问题自动选择合适的工具：
+
+```
+用户：我想做一个 AI 代码助手
+Agent：这个想法很有潜力！我可以帮你分析竞对、市场规模、客户画像，或者生成完整的 VC 评估报告。
+
+用户：竞对有谁啊？
+Agent：[调用 competitor_analysis 工具]
+      主要竞对包括 GitHub Copilot、Cursor、Codeium...
+
+用户：市场规模呢？
+Agent：[调用 market_sizing 工具]
+      全球代码助手市场预计 2025 年达到 50 亿美元...
+
+用户：我需要一个完整的 VC 评估报告
+Agent：[调用 vc_evaluation_report 工具]
+      正在生成综合报告（包含竞对分析、市场机会、客户画像、投资建议）...
+```
+
+## 目录结构
+
+```
+playground/
+├── README.md                          # 本文件
+├── QUICKSTART.md                      # 快速开始指南
+│
+├── core/                              # 核心框架
+│   ├── base-tool.ts                  # 简化版 BaseTool（去掉复杂依赖）
+│   └── startup-advisor.ts            # 创业顾问 Agent 工厂函数
+│
+├── tools/                             # 独立工具
+│   ├── competitor.tool.ts            # 竞对分析（Mock 数据）
+│   ├── market.tool.ts                # 市场规模（Mock 数据）
+│   ├── customer.tool.ts              # 客户分析（Mock 数据）
+│   └── vc-report.tool.ts             # VC 评估报告（整合其他工具）
+│
+├── context/                           # 🧠 上下文管理（核心！）
+│   ├── types.ts                      # 上下文类型定义
+│   ├── memory.ts                     # 工作记忆管理器
+│   ├── extractor.ts                  # 上下文提取工具
+│   └── context-aware-agent.ts        # 带完整上下文管理的 Agent
+│
+├── docs/                              # 文档
+│   └── CONTEXT_MANAGEMENT.md         # 上下文管理详解
+│
+└── examples/                          # 渐进式示例
+    ├── 01-single-question.ts         # Level 1: 单个问题 → 单个工具
+    ├── 02-multi-turn-chat.ts         # Level 2: 多轮对话 + 自动选择工具
+    ├── 03-full-conversation.ts       # Level 3: 完整对话流程 + VC 报告
+    ├── 04-with-context-management.ts # Level 4: 完整上下文管理 ⭐
+    └── comparison-with-without-context.ts # 对比：有无上下文管理
+```
+
+## 设计原则
+
+### 1. 简化 vs 现有 agentia
+- ❌ **去掉**：Context 依赖（sessionId/userId）、数据库、复杂的 service 层
+- ✅ **保留**：BaseTool 框架、Zod schemas、商业场景工具
+- ✅ **新增**：更清晰的对话流程、渐进式学习路径
+
+### 2. 工具设计
+每个工具都是**独立的、纯函数式**的：
+- 输入：简单的参数（ideaDescription, query 等）
+- 输出：结构化的 JSON
+- 无状态：不依赖外部 context 或数据库
+
+### 3. 对话模式
+使用 LangChain 的 `createReactAgent` + `AgentExecutor`：
+- 自动判断何时调用工具
+- 支持多轮对话（chat history）
+- 工具调用透明可见
 
 ## 快速开始
 
-### 安装
-
+### 安装依赖
 ```bash
-# 使用 pnpm (推荐)
 pnpm install
-
-# 或使用 npm
-npm install
 ```
 
 ### 运行示例
 
+#### Level 1: 单个问题
 ```bash
-# 基础示例（使用 mock 数据）
-pnpm dev
+npx tsx playground/examples/01-single-question.ts
+```
+**场景**：用户问"这个创业想法的竞对有谁？"，Agent 调用 competitor_analysis 工具
 
-# 增强工具演示（Web Search + AI 分析）
-pnpm dev:enhanced
+#### Level 2: 多轮对话
+```bash
+npx tsx playground/examples/02-multi-turn-chat.ts
+```
+**场景**：用户连续提问，Agent 保持上下文，自动选择不同工具
 
-# 构建
-pnpm build
+#### Level 3: 完整对话 + VC 报告
+```bash
+npx tsx playground/examples/03-full-conversation.ts
+```
+**场景**：从初步咨询到生成完整 VC 评估报告的完整流程
 
-# 运行构建后的代码
-pnpm start
+#### ⭐ Level 4: 完整上下文管理（推荐）
+```bash
+npx tsx playground/examples/04-with-context-management.ts
+```
+**场景**：展示完整上下文管理的威力
+- ✅ 自动提取创业想法信息
+- ✅ 缓存工具结果（避免重复调用）
+- ✅ 智能意图检测
+- ✅ 上下文感知的回答
+
+#### 对比示例
+```bash
+npx tsx playground/examples/comparison-with-without-context.ts
+```
+直观对比有无上下文管理的差异
+
+## 🧠 上下文管理 - Agent 的核心
+
+**为什么上下文管理如此重要？**
+
+上下文管理是 Agent 质量的决定性因素。没有好的上下文管理，Agent 就只是一个"健忘的聊天机器人"。
+
+### ❌ 没有上下文管理
+```
+用户：我想做一个 AI 代码助手
+Agent：很好！
+
+用户：竞对有谁？
+Agent：[调用工具] GitHub Copilot...
+
+用户：那我应该如何差异化？
+Agent：请问你的创业想法是什么？  ← ❌ 忘记了"AI 代码助手"
 ```
 
-## 项目结构
-
+### ✅ 有完整上下文管理
 ```
-agentia/
-├── src/
-│   ├── langchain/                      # LangChain 实现
-│   │   ├── types.ts                    # 类型定义
-│   │   ├── agents/                     # Agent 层（编排）
-│   │   │   ├── BaseAgent.ts
-│   │   │   └── ResearchAgent.ts
-│   │   ├── tools/                      # Tool 层（业务逻辑）
-│   │   │   ├── competitorResearch.tool.ts          # 基础版本
-│   │   │   ├── competitorResearch.enhanced.tool.ts # 增强版本
-│   │   │   ├── marketSizeResearch.tool.ts
-│   │   │   ├── customerAnalysis.tool.ts
-│   │   │   └── index.ts
-│   │   ├── services/                   # Service 层（可复用服务）
-│   │   │   ├── webSearch.service.ts    # Web 搜索
-│   │   │   └── aiAnalyzer.service.ts   # AI 分析
-│   │   └── models/                     # 模型配置
-│   │       └── index.ts
-│   ├── examples/                       # 示例代码
-│   │   └── enhanced-tool-demo.ts
-│   └── index.ts                        # 入口文件
-├── ENHANCED_TOOL_GUIDE.md              # ✅ 增强工具指南
-├── TOOL_DESIGN_PATTERNS.md             # ✅ 工具设计模式
-├── FINAL_IMPLEMENTATION.md             # 最终实现说明
-└── LANGCHAIN_ARCHITECTURE.md           # 完整架构文档
+用户：我想做一个 AI 代码助手
+Agent：[提取并记住：idea="AI代码助手"] 很好！
+
+用户：竞对有谁？
+Agent：[调用工具并缓存] GitHub Copilot...
+      [记住：已分析竞对]
+
+用户：那我应该如何差异化？
+Agent：[使用缓存的竞对分析 + 记住的想法]
+      基于你的 AI 代码助手想法和刚才的竞对分析...  ← ✅ 记住所有上下文
 ```
 
-## 核心概念
+### 上下文管理的 5 个层次
 
-### 1. 定义 Tool（使用官方 API）
+1. **Level 1**: 单轮上下文（当前输入）
+2. **Level 2**: 对话历史（消息序列）← 基础 Agent 只到这里
+3. **Level 3**: 工作记忆（结构化信息提取）← ⭐ 这是关键！
+4. **Level 4**: 知识图谱（实体和关系）
+5. **Level 5**: 跨会话记忆（长期记忆）
+
+**本 Playground 实现了 Level 1-3**，这已经能显著提升 Agent 质量！
+
+详细文档：[docs/CONTEXT_MANAGEMENT.md](docs/CONTEXT_MANAGEMENT.md)
+
+### 使用 Context-Aware Agent
 
 ```typescript
-import { tool } from "langchain";
-import { z } from "zod";
+import { ContextAwareAgent } from "./context/context-aware-agent";
+import { allTools } from "./tools";
 
-export const myTool = tool(
-  async ({ param }) => {
-    // 你的业务逻辑
-    return { result: "..." };
-  },
-  {
-    name: "my_tool",
-    description: "What it does",
-    schema: z.object({
-      param: z.string().describe("Parameter description"),
-    }),
-  }
-);
+// 创建带上下文管理的 Agent
+const agent = new ContextAwareAgent(allTools);
+
+// 对话
+await agent.chat("我想做一个 AI 代码助手");
+await agent.chat("竞对有谁？");
+await agent.chat("基于竞对，我应该如何定价？"); // ← 自动使用缓存的竞对分析
+
+// 查看记忆
+agent.printMemorySummary();
 ```
 
-### 2. 创建 Agent（继承 BaseAgent）
+## 工具说明
 
+### 1. competitor_analysis
+分析创业想法的竞争对手
+- 输入：`ideaDescription` (string)
+- 输出：竞对列表、市场成熟度、差异化策略
+
+### 2. market_sizing
+估算市场规模（TAM/SAM/SOM）
+- 输入：`ideaDescription` (string)
+- 输出：市场大小、增长率、目标市场
+
+### 3. customer_analysis
+分析客户画像和需求
+- 输入：`ideaDescription` (string)
+- 输出：客户分段、ICP、购买流程
+
+### 4. vc_evaluation_report
+生成综合 VC 评估报告
+- 输入：`ideaDescription` (string)
+- 输出：7 维度评分、SWOT 分析、投资建议
+- **特点**：内部会自动调用其他 3 个工具
+
+## 核心代码示例
+
+### 创建 Agent
 ```typescript
-import { BaseAgent } from "./langchain/agents/BaseAgent.js";
-import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { myTool } from "./langchain/tools/myTool.js";
+import { createStartupAdvisor } from "./core/startup-advisor";
+import { allTools } from "./tools";
 
-export class MyAgent extends BaseAgent {
-  constructor(apiKey: string) {
-    super({
-      name: "MyAgent",
-      description: "My custom agent",
-      systemPrompt: "You are a helpful assistant...",
-      model: new ChatGoogleGenerativeAI({
-        apiKey,
-        model: "gemini-2.0-flash-exp",
-      }),
-      tools: [myTool],  // 直接传入 tool 实例
-    });
-  }
-}
-```
+const agent = createStartupAdvisor(allTools);
 
-### 3. 使用 Agent
-
-```typescript
-const agent = new MyAgent(process.env.GOOGLE_API_KEY);
-
-const result = await agent.execute("User query", {
-  sessionId: "session_123",
-  userId: "user_456",
+const result = await agent.invoke({
+  input: "我想做一个 AI 代码助手，竞对有谁？"
 });
 
 console.log(result.output);
 ```
 
-### 4. 并行工具调用（自动）
-
-LangChain 自动处理工具的并行调用：
-
-```
-用户: "分析咖啡店创业 idea"
-  ↓
-Agent 判断需要多个工具
-  ↓
-自动并行调用:
-  - competitor_research
-  - market_size_research
-  ↓
-等待所有结果
-  ↓
-整合生成最终报告
-```
-
-### 5. 增强工具：Web Search + AI 分析
-
-结合 Service Layer 实现复杂的工具：
-
+### 多轮对话
 ```typescript
-import { tool } from "langchain";
-import { searchWeb } from "../services/webSearch.service.js";
-import { analyzeWithAI } from "../services/aiAnalyzer.service.js";
-import { getModel } from "../models/index.js";
+const chatHistory = [];
 
-export const competitorResearchEnhanced = tool(
-  async ({ industry, region, limit }) => {
-    // Step 1: Web 搜索
-    const searchResults = await searchWeb(
-      `top competitors in ${industry} ${region}`,
-      { limit: limit * 2 }
-    );
+// 第一轮
+let result = await agent.invoke({
+  input: "我想做一个 AI 代码助手",
+  chat_history: chatHistory
+});
+chatHistory.push(...result.messages);
 
-    // Step 2: AI 分析
-    const analysis = await analyzeWithAI(
-      searchResults.results,
-      `Extract top ${limit} competitors with their strengths and weaknesses...`,
-      {
-        model: getModel("gemini-flash"),
-        responseFormat: "json"
-      }
-    );
-
-    // Step 3: 返回结构化结果
-    return {
-      summary: `Found ${analysis.competitors.length} competitors`,
-      competitors: analysis.competitors,
-      keyInsights: analysis.keyInsights
-    };
-  },
-  {
-    name: "competitor_research_enhanced",
-    description: "Advanced competitor research using web search and AI",
-    schema: z.object({
-      industry: z.string(),
-      region: z.string(),
-      limit: z.number().default(5)
-    })
-  }
-);
+// 第二轮
+result = await agent.invoke({
+  input: "竞对有谁？",
+  chat_history: chatHistory
+});
 ```
 
-**三层架构优势：**
-- ✅ **Service 可复用**: `searchWeb` 和 `analyzeWithAI` 可被多个 tools 使用
-- ✅ **易于测试**: 每个 service 可以独立测试
-- ✅ **灵活切换**: 更换搜索提供商或 AI 模型无需修改 tool 代码
-- ✅ **清晰的职责**: Service = 基础能力，Tool = 业务逻辑，Agent = 任务编排
+## 与现有 agentia 的对比
 
-## 为什么选择这个架构？
+| 维度 | 现有 agentia | Playground |
+|-----|-------------|-----------|
+| 目标 | 生产级应用 | 学习 + 实验 |
+| 复杂度 | 28 文件，深度嵌套 | ~10 文件，扁平结构 |
+| 依赖 | 数据库、多个 API | 仅 LangChain + Mock 数据 |
+| Context | sessionId/userId 追踪 | 无状态，纯函数 |
+| 工具调用 | 混合（有些在 service 内部） | 统一通过 Agent tool calling |
+| 学习曲线 | 陡峭 | 渐进式（3 个 level） |
 
-### ✅ 解决的问题
+## 后续扩展方向
 
-你之前遇到的问题：
-- ❌ Agent 和 Tool 设计混乱
-- ❌ 维护成本高
-- ❌ 难以扩展
+1. **添加真实 API**
+   - 集成 Serper（搜索）
+   - 集成 Gemini（内容提取）
 
-现在的解决方案：
-- ✅ **清晰分离**: Tool = 执行，Agent = 编排
-- ✅ **易维护**: 每个 Tool 独立文件，修改互不影响
-- ✅ **易扩展**: 添加 Tool 只需创建文件 + 导出
+2. **添加记忆层**
+   - 使用 LangChain Memory
+   - 跨会话的上下文保持
 
-详细架构说明请查看：
-- **[FINAL_IMPLEMENTATION.md](./FINAL_IMPLEMENTATION.md)** - 最终实现和 API 对比
-- **[LANGCHAIN_API_GUIDE.md](./LANGCHAIN_API_GUIDE.md)** - 完整 API 使用指南
-- **[LANGCHAIN_ARCHITECTURE.md](./LANGCHAIN_ARCHITECTURE.md)** - 架构设计原则
+3. **工具编排**
+   - 工具链（Tool Chaining）
+   - 并行工具调用
 
-## 主要依赖
+4. **结构化输出**
+   - 强制 JSON Schema 输出
+   - 使用 `.withStructuredOutput()`
 
-- **LangChain** (v1.2.0) - Agent 编排框架
-- **@langchain/google-genai** - Google Gemini 集成
-- **Zod** - Schema 验证和类型安全
-- **TypeScript** - 完整类型支持
+## 注意事项
 
-## 示例演示
-
-项目包含完整的 ResearchAgent 示例：
-
-```bash
-# 设置 API Key
-export GOOGLE_API_KEY="your_api_key_here"
-
-# 运行演示
-pnpm dev
-```
-
-演示包括：
-- ✅ 基础研究查询
-- ✅ 完整创业分析（并行工具调用）
-- ✅ 多轮对话
-
-## 文档索引
-
-按推荐顺序阅读：
-
-1. **[README.md](./README.md)** (本文件) - 快速开始
-2. **[ENHANCED_TOOL_GUIDE.md](./ENHANCED_TOOL_GUIDE.md)** - 增强工具完整指南 ⭐ 必读
-3. **[TOOL_DESIGN_PATTERNS.md](./TOOL_DESIGN_PATTERNS.md)** - 工具设计模式详解
-4. **[FINAL_IMPLEMENTATION.md](./FINAL_IMPLEMENTATION.md)** - 最终实现说明
-5. **[LANGCHAIN_ARCHITECTURE.md](./LANGCHAIN_ARCHITECTURE.md)** - 架构设计细节
-
-## 参考资源
-
-- [LangChain JS 官方文档](https://docs.langchain.com/oss/javascript/langchain/agents)
-- [LangChain GitHub](https://github.com/langchain-ai/langchainjs)
+- 所有工具返回的都是 **Mock 数据**，适合快速实验
+- 需要设置 `OPENAI_API_KEY` 或其他 LLM provider 的 API key
+- 示例中的对话是硬编码的，你可以改成交互式输入
 
 ## License
 
-ISC
-
----
-
-**Sources:**
-- [LangChain overview - Docs by LangChain](https://docs.langchain.com/oss/javascript/langchain/overview)
-- [GitHub - langchain-ai/langchainjs](https://github.com/langchain-ai/langchainjs)
+MIT
