@@ -53,14 +53,14 @@ const examples = [
   },
   {
     id: "7",
-    name: "Deep Agent (Simple)",
-    description: "DeepAgents without subagents",
+    name: "Simple Agent",
+    description: "Basic agent with tools (no subagents)",
     file: "examples/07-deep-agent-simple.ts",
   },
   {
     id: "8",
-    name: "Deep Agent (Full)",
-    description: "DeepAgents with subagents",
+    name: "Deep Agent (Full) ⚠️ BROKEN",
+    description: "DeepAgents - Has unfixable bug, use Example 10 instead",
     file: "examples/08-deep-agent.ts",
   },
   {

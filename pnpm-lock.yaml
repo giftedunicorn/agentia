@@ -35,6 +35,9 @@ importers:
       '@langchain/openai':
         specifier: ^1.2.0
         version: 1.2.0(@langchain/core@1.1.5(@opentelemetry/api@1.9.0)(openai@6.10.0(ws@8.18.3)(zod@4.1.13)))(ws@8.18.3)
+      '@langchain/tavily':
+        specifier: ^1.1.0
+        version: 1.1.0(@langchain/core@1.1.5(@opentelemetry/api@1.9.0)(openai@6.10.0(ws@8.18.3)(zod@4.1.13)))
       '@openrouter/ai-sdk-provider':
         specifier: ^1.5.3
         version: 1.5.3(ai@5.0.113(zod@4.1.13))(zod@4.1.13)
@@ -734,6 +737,12 @@ packages:
 
   '@langchain/openai@1.2.0':
     resolution: {integrity: sha512-r2g5Be3Sygw7VTJ89WVM/M94RzYToNTwXf8me1v+kgKxzdHbd/8XPYDFxpXEp3REyPgUrtJs+Oplba9pkTH5ug==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@langchain/core': ^1.0.0
+
+  '@langchain/tavily@1.1.0':
+    resolution: {integrity: sha512-RkvBT//wMioKM3O8LrlvzweYJFL6Srhdz0cjVTodZsxQy0FedJ5DQXJ36Ul/11bRES1Oe/XOW8vT7D+fSxJ92Q==}
     engines: {node: '>=20'}
     peerDependencies:
       '@langchain/core': ^1.0.0
@@ -1727,6 +1736,11 @@ snapshots:
       zod: 4.1.13
     transitivePeerDependencies:
       - ws
+
+  '@langchain/tavily@1.1.0(@langchain/core@1.1.5(@opentelemetry/api@1.9.0)(openai@6.10.0(ws@8.18.3)(zod@4.1.13)))':
+    dependencies:
+      '@langchain/core': 1.1.5(@opentelemetry/api@1.9.0)(openai@6.10.0(ws@8.18.3)(zod@4.1.13))
+      zod: 4.1.13
 
   '@langchain/textsplitters@1.0.1(@langchain/core@1.1.5(@opentelemetry/api@1.9.0)(openai@6.10.0(ws@8.18.3)(zod@4.1.13)))':
     dependencies:
