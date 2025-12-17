@@ -59,7 +59,7 @@ function runExample(id: string) {
 
   console.log(`\n▶️  Running: ${example.name}...\n`);
   try {
-    execSync(`npx tsx playground/${example.file}`, { stdio: "inherit" });
+    execSync(`npx tsx src/${example.file}`, { stdio: "inherit" });
   } catch (error) {
     console.error(`\n❌ Example ${id} failed:`, error);
     process.exit(1);
