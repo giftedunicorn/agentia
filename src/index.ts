@@ -33,6 +33,18 @@ const examples = [
     description: "Complete workflow with comprehensive report",
     file: "examples/03-full-conversation.ts",
   },
+  {
+    id: "4",
+    name: "Context-Aware Conversation",
+    description: "Advanced context management with working memory",
+    file: "examples/04-with-context-management.ts",
+  },
+  {
+    id: "5",
+    name: "Comparison with and without context",
+    description: "Comparison with and without context",
+    file: "examples/comparison-with-without-context.ts",
+  },
 ];
 
 function printHelp() {
