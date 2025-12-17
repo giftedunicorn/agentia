@@ -53,15 +53,21 @@ const examples = [
   },
   {
     id: "7",
-    name: "Deep Agent (Full)",
-    description: "DeepAgents with planning, subagents, and file system",
-    file: "examples/07-deep-agent.ts",
+    name: "Deep Agent (Simple)",
+    description: "DeepAgents without subagents",
+    file: "examples/07-deep-agent-simple.ts",
   },
   {
     id: "8",
+    name: "Deep Agent (Full)",
+    description: "DeepAgents with subagents",
+    file: "examples/08-deep-agent.ts",
+  },
+  {
+    id: "9",
     name: "Deep Agent (Manual)",
     description: "Manual deep agent assembly with middleware",
-    file: "examples/08-manual-deep-agent.ts",
+    file: "examples/09-manual-deep-agent.ts",
   },
 ];
 
