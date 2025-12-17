@@ -93,7 +93,7 @@ async function generateVCReport(input: {
   ];
 
   const overallScore = Math.round(
-    scores.reduce((sum, s) => sum + s.score, 0) / scores.length * 10
+    (scores.reduce((sum, s) => sum + s.score, 0) / scores.length) * 10
   );
 
   let recommendation: "Strong Pass" | "Pass" | "Maybe" | "No";
