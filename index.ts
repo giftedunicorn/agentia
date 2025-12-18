@@ -226,11 +226,33 @@ async function main() {
       .map((todo) => ` - ${todo.content} (${todo.status})`)
       .join("\n")}`
   );
-  console.log(
-    `\n\nAgent Files:\n${Object.entries(result.files)
-      .map(([key, value]) => ` - ${key}: ${value}`)
-      .join("\n")}`
-  );
+
+  // Display files with their content
+  console.log("\n\n📁 Agent Files:");
+  if (result.files && Object.keys(result.files).length > 0) {
+    for (const [path, fileData] of Object.entries(result.files)) {
+      console.log(`\n${"=".repeat(70)}`);
+      console.log(`📄 ${path}`);
+      console.log(`${"=".repeat(70)}`);
+      // FileData has a content property that is an array of strings
+      const content = fileData.content.join("\n");
+
+      // Save the final report to an actual file
+      if (path === "/final_report.md") {
+        const fs = await import("fs/promises");
+        await fs.writeFile("final_report.md", content);
+        console.log("\n✅ Final report saved to: final_report.md");
+      }
+
+      // Show preview of content (first 500 chars)
+      const preview = content.length > 500
+        ? content.substring(0, 500) + "...\n[Content truncated]"
+        : content;
+      console.log(preview);
+    }
+  } else {
+    console.log("(No files created)");
+  }
 }
 
 // Run if this file is executed directly
