@@ -14,11 +14,8 @@
 
 import { createDeepAgent, type SubAgent } from "../deepagents";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import {
-  competitorTool,
-  marketTool,
-  customerTool,
-} from "../tools";
+import { createReactAgent } from "@langchain/agents";
+import { competitorTool, marketTool, customerTool } from "../tools";
 
 /**
  * 主 Agent 的 System Prompt

@@ -237,19 +237,16 @@ async function main() {
       // FileData has a content property that is an array of strings
       const content = fileData.content.join("\n");
 
-      // Save the final report to an actual file
-      if (path === "/final_report.md") {
-        const fs = await import("fs/promises");
-        await fs.writeFile("final_report.md", content);
-        console.log("\n✅ Final report saved to: final_report.md");
-      }
-
       // Show preview of content (first 500 chars)
       const preview = content.length > 500
-        ? content.substring(0, 500) + "...\n[Content truncated]"
+        ? content.substring(0, 500) + "...\n[Content truncated - see result.files for full content]"
         : content;
       console.log(preview);
     }
+
+    // Show how to access files in your code
+    console.log("\n\n💡 Access files in your code:");
+    console.log("const report = result.files['/final_report.md'].content.join('\\n');");
   } else {
     console.log("(No files created)");
   }

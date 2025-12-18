@@ -9,7 +9,11 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev:index": "tsx index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "learn:1": "tsx examples/learning-01-basic.ts",
+    "learn:2": "tsx examples/learning-02-filesystem.ts",
+    "learn:3": "tsx examples/learning-03-subagents.ts",
+    "learn:4": "tsx examples/learning-04-backends.ts"
   },
   "keywords": [
     "ai",
