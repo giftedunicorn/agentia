@@ -238,15 +238,19 @@ async function main() {
       const content = fileData.content.join("\n");
 
       // Show preview of content (first 500 chars)
-      const preview = content.length > 500
-        ? content.substring(0, 500) + "...\n[Content truncated - see result.files for full content]"
-        : content;
+      const preview =
+        content.length > 500
+          ? content.substring(0, 500) +
+            "...\n[Content truncated - see result.files for full content]"
+          : content;
       console.log(preview);
     }
 
     // Show how to access files in your code
     console.log("\n\n💡 Access files in your code:");
-    console.log("const report = result.files['/final_report.md'].content.join('\\n');");
+    console.log(
+      "const report = result.files['/final_report.md'].content.join('\\n');"
+    );
   } else {
     console.log("(No files created)");
   }

@@ -14,7 +14,6 @@
 
 import { createDeepAgent, type SubAgent } from "../deepagents";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { createReactAgent } from "@langchain/agents";
 import { competitorTool, marketTool, customerTool } from "../tools";
 
 /**
